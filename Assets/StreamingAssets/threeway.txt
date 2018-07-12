@@ -1,0 +1,101 @@
+AREA:SW,Arial,36,255,255,255,0.55,0.2,.9,.8
+AREA:RR,Arial,36,255,180,180,0.1,0.2,.45,.8
+AREA:NN,Arial,36,255,230,69,0.2,0.8,.8,1
+
+#CAP 1,NN
+[3-f.jpg]
+Music
+#CAP 2,NN
+Clean the house.
+
+#CAP 3,NN
+Urgent knocking at window
+ 
+#CAP 4,RR
+Help, help. Let me in!
+#CAP 4B,RR
+#CAP 4B,SW
+No. Go away!
+
+#CAP 5,SW
+#CAP 5,RR
+The wolf is after me! Please let me in!
+{test1.mp4}
+
+#CAP 6,SW
+#CAP 6,RR
+#CAP 6,NN
+
+#CAP 7,SW
+What are you doing in the woods?
+{MOV_1355.mp4}  
+
+#CAP 8,SW
+#CAP 8,RR
+I’m on my way to grandmother’s house to bring her some cakes. She’s been ill, poor lamb. 
+
+#CAP 9,RR
+#CAP 9,SW
+On your way then.
+
+#CAP 10,SW
+#CAP 10,RR
+I can’t go yet, the wolf’s out there. He’ll eat me!
+
+#CAP 11,RR
+#CAP 11,SW
+Hmm, what’s your name?
+
+#CAP 11B,SW
+#CAP 11B,RR
+Little Red Riding Hood.
+
+#CAP 12,RR
+#CAP 12,SW
+The Little Red Riding Hood? 
+
+#CAP 12B,SW
+#CAP 12B,RR
+Uhuh. 
+
+#CAP 13
+
+
+#CAP 14,RR
+Do you like fairy cakes? I have lots, would you like one? 
+
+#CAP 15
+
+#CAP 16,RR
+Look, new laces for grandma. The red ones would suit you. Try them. 
+
+#CAP 17,RR
+#CAP 17,SW
+I couldn’t
+
+#CAP 18,SW
+#CAP 18,RR
+Sure you can, it’s the least I can do, to repay your kindness.
+
+#CAP 19,SW
+#CAP 19,RR
+Here, let me help.
+
+#CAP 20,SW
+#CAP 20,RR
+Oops! I’m sorry, did I tie the laces too tight? 
+
+#CAP 21,SW
+#CAP 21,RR
+That will save on boarding school fees. 
+
+#CAP 22,SW
+#CAP 22,RR
+#CAP 22,NN
+Music
+
+#CAP 23,NN
+As evening fell, the 7 dwarfs came home. They were distressed to see Snow White. Lifting her up, they saw her laces were tied too tightly and cut them. 
+
+#CAP 24,NN
+Snow White gasped and began to breathe again.

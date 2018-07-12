@@ -1,0 +1,80 @@
+AREA:A0,Arial,36,255,255,255,0.2,0.2,.8,.8
+AREA:A1,Arial,18,255,230,69,0.2,0.8,.8,1
+
+
+#CAP 1
+[3-f.jpg]
+Music
+#CAP 2
+Snow White: Clean the house.
+
+#CAP 3
+Urgent knocking at window
+ 
+#CAP 4
+Little Red Riding Hood: Help, help. Let me in!
+Snow White: No. Go away!
+
+#CAP 5
+Little Red Riding Hood: The wolf is after me! Please let me in!
+{test1.mp4}
+
+#CAP 6
+
+#CAP 7
+Snow White: What are you doing in the woods?
+{MOV_1355.mp4}
+
+#CAP 8
+Little Red Riding Hood: I’m on my way to grandmother’s house to bring her some cakes. She’s been ill, poor lamb. 
+
+#CAP 9
+Snow White: On your way then.
+
+#CAP 10
+Little Red Riding Hood: I can’t go yet, the wolf’s out there. He’ll eat me!
+
+#CAP 11
+Snow White: Hmm, what’s your name?
+
+Little Red Riding Hood: Little Red Riding Hood.
+
+#CAP 12
+Snow White: The Little Red Riding Hood? 
+
+Little Red Riding Hood: Uhuh. 
+
+#CAP 13
+
+
+#CAP 14
+Little Red Riding Hood: Do you like fairy cakes? I have lots, would you like one? 
+
+#CAP 15
+
+#CAP 16
+  <b>Little Red Riding Hood</b>: Look, new laces for grandma. The red ones would suit you. Try them. 
+
+#CAP 17
+Snow White: I couldn’t
+
+#CAP 18
+Little Red Riding Hood: Sure you can, it’s the least I can do, to repay your kindness.
+
+#CAP 19
+Here, let me help.
+
+#CAP 20
+Little Red Riding Hood: Oops! I’m sorry, did I tie the laces too tight? 
+
+#CAP 21
+Step Mother: That will save on boarding school fees. 
+
+#CAP 22
+Music
+
+#CAP 23
+Narrator: As evening fell, the 7 dwarfs came home. They were distressed to see Snow White. Lifting her up, they saw her laces were tied too tightly and cut them. 
+
+#CAP 24
+Snow White gasped and began to breathe again.
