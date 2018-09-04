@@ -13,6 +13,11 @@ public class PolyText : Graphic {
     public TextGenerator generator;
     public List<Vector2> clipPoly=new List<Vector2>();
     
+    public Material polyMaterial;
+    public bool showPoly=false;
+    public bool forceFlatTopAndBottom=false;
+    
+    
     // two lists of positions - in centered stuff, we need one for odd numbers of lines, one for even number of lines
     // nb. note that  numbers of lines is a bit of a misnomer, as numbers of lines may change based on shape of polygon
     
@@ -81,21 +86,46 @@ public class PolyText : Graphic {
         offsetSlices.Clear();
         // find max and min of polygon
         
-        float maxY=0;
+        float maxY=clipPoly[0].y;
         float minY=clipPoly[0].y;
+        int maxPos=0;
+        int minPos=0;
         
         for(int c=0;c<clipPoly.Count;c++)
         {
             if(clipPoly[c].y>maxY)
             {
                 maxY=clipPoly[c].y;
+                maxPos=c;
             }
             if(clipPoly[c].y<minY)
             {
                 minY=clipPoly[c].y;
+                minPos=c;
             }
         }
         
+        if(forceFlatTopAndBottom)
+        {
+            // if there are two points at the top that aren't level, then chop that triangle off
+            // if there are two points at the bottom that aren't level then chop that triangle off
+            // this avoids laying out very short lines at the top or bottom
+            float nextMinY=maxY;
+            float nextMaxY=minY;
+            for(int c=0;c<clipPoly.Count;c++)
+            {
+                if(clipPoly[c].y>nextMaxY && c!=maxPos)
+                {
+                    nextMaxY=clipPoly[c].y;
+                }
+                if(clipPoly[c].y<nextMinY && c!=minPos)
+                {
+                    nextMinY=clipPoly[c].y;
+                }
+            }
+            maxY=nextMaxY;
+            minY=nextMinY;
+        }
         
         // put the lines equally between min and max        
         int lineCount= (int)((maxY-minY)/lineHeight);
@@ -112,9 +142,11 @@ public class PolyText : Graphic {
             getPolyWidth(endY,out left1,out right1);
             float sliceLeft=Mathf.Max(left0,left1);
             float sliceRight=Mathf.Min(right0,right1);
-            //print("Slice("+c+")"+sliceLeft+","+sliceRight);
-            slices.Add(new Rect(sliceLeft,startY,sliceRight-sliceLeft,endY-startY));
-            
+//            print("Slice("+c+")"+sliceLeft+","+sliceRight);
+            if(sliceLeft<sliceRight)
+            {
+                slices.Add(new Rect(sliceLeft,startY,sliceRight-sliceLeft,endY-startY));
+            }
             // for vertical centering, we need to have offset lines (for odd number of lines)
             if(c<lineCount-1)
             {
@@ -124,7 +156,10 @@ public class PolyText : Graphic {
                 getPolyWidth(offsetEndY,out left1,out right1);
                 float oSliceLeft=Mathf.Max(left0,left1);
                 float oSliceRight=Mathf.Min(right0,right1);
-                offsetSlices.Add(new Rect(oSliceLeft,offsetStartY,oSliceRight-oSliceLeft,offsetEndY-offsetStartY));
+                if(oSliceLeft<oSliceRight)
+                {
+                    offsetSlices.Add(new Rect(oSliceLeft,offsetStartY,oSliceRight-oSliceLeft,offsetEndY-offsetStartY));
+                }
             }
             
             startY=endY; 
@@ -135,7 +170,13 @@ public class PolyText : Graphic {
     
     protected override void UpdateMaterial()
     {
-        GetComponent<CanvasRenderer>().SetMaterial(font.material, null);
+        if(!showPoly)
+        {
+            GetComponent<CanvasRenderer>().SetMaterial(font.material, null);
+        }else
+        {
+            GetComponent<CanvasRenderer>().SetMaterial(polyMaterial, null);
+        }
     }
     
     string reverseString(string input)
@@ -148,6 +189,9 @@ public class PolyText : Graphic {
 
     protected override void OnPopulateMesh(VertexHelper vh)
     {
+        Vector2 totalSize=GetComponent<RectTransform>().rect.size;
+        Vector2 topLeft=GetComponent<RectTransform>().rect.min;
+
         TextAnchor horzAlign=TextAnchor.UpperCenter;
         if(alignment==TextAnchor.MiddleCenter || alignment==TextAnchor.LowerCenter)horzAlign=TextAnchor.UpperCenter;
         if(alignment==TextAnchor.MiddleLeft || alignment==TextAnchor.LowerLeft || alignment==TextAnchor.UpperLeft)horzAlign=TextAnchor.UpperLeft;
@@ -164,8 +208,32 @@ public class PolyText : Graphic {
         TextGenerationSettings settings = new TextGenerationSettings();
 
         vh.Clear();
+        
+        if(showPoly)
+        {
+            Triangulator tr = new Triangulator(clipPoly);
+            int[] indices = tr.Triangulate();
+ 
+            // Create the UIVertex vertices
+            UIVertex ver=UIVertex.simpleVert;
+            for (int i=0; i<clipPoly.Count; i++) 
+            {
+                ver.position.x=topLeft.x+clipPoly[i].x*totalSize.x;
+                ver.position.y=topLeft.y+(totalSize.y-clipPoly[i].y*totalSize.y);
+                ver.position.z=0;
+//                ver.position.y-=drawRect.y*totalSize.y;
+//                ver.position.x+=thisWidth*.5f;
+//                ver.position.x-=totalSize.x*.5f;
+//                ver.position.x+=drawRect.x*totalSize.x;
+                vh.AddVert( ver);
+            }
+            for(int i=0;i<indices.Length;i+=3)
+            {
+                vh.AddTriangle(indices[i],indices[i+1],indices[i+2]);
+            }
+//            return;
+        }
 
-        Vector2 totalSize=GetComponent<RectTransform>().rect.size;
 
 
         settings.textAnchor = horzAlign;
@@ -188,27 +256,50 @@ public class PolyText : Graphic {
         
         if(alignment==TextAnchor.UpperCenter || alignment==TextAnchor.UpperRight || alignment==TextAnchor.UpperLeft)
         {
-            // top down - easy case - just wrap normally and put each line into a slice in turn
-            string textLeft=text;
-            for(int c=0;c<slices.Count;c++)
+            // top down - wrap normally and put each line into a slice in turn
+            // n.b. if first word is longer than the first slice then try to change start slice until it does fit in
+            for(int startSlice=0;startSlice<slices.Count;startSlice++)
             {
-                float thisWidth=slices[c].width*totalSize.x;
-                
-                //print(slices[c].y);
-                Rect r = slices[c];
-                settings.generationExtents = new Vector2(thisWidth,totalSize.y);
-                generator.Populate(textLeft, settings);
-                float maxVertex=generator.verts.Count;
-//                print(textLeft+","+generator.lines.Count+","+thisWidth+","+totalSize.x);
-                slicePositions.Add(slices[c]);
-                if(generator.lines.Count>1)
+                sliceLines.Clear();
+                slicePositions.Clear();
+                string textLeft=text;
+                bool firstLine=true;                
+                for(int c=startSlice;c<slices.Count;c++)
                 {
-                    sliceLines.Add(textLeft.Substring(0,generator.lines[1].startCharIdx));
-//                    maxVertex=generator.lines[1].startCharIdx*4;
-                    textLeft=textLeft.Substring(generator.lines[1].startCharIdx);
-                }else
+                    float thisWidth=slices[c].width*totalSize.x;
+                    
+                    //print(slices[c].y);
+                    Rect r = slices[c];
+                    settings.generationExtents = new Vector2(thisWidth,totalSize.y);
+                    generator.Populate(textLeft, settings);
+                    float maxVertex=generator.verts.Count;
+                    slicePositions.Add(slices[c]);
+                    if(generator.lines.Count>1)
+                    {
+                        if(firstLine)
+                        {
+                            firstLine=false;
+                            // check that a word hasn't been split on the first line
+                            print("***"+textLeft[generator.lines[1].startCharIdx-1]+"***");
+                            if(char.IsLetterOrDigit(textLeft[generator.lines[1].startCharIdx-1]))
+                            {
+                                print("Letter or digit at end, dropping out");
+                                // drop out and try the next start slice
+                                break;
+                            }
+                        }
+                        sliceLines.Add(textLeft.Substring(0,generator.lines[1].startCharIdx));
+    //                    maxVertex=generator.lines[1].startCharIdx*4;
+                        textLeft=textLeft.Substring(generator.lines[1].startCharIdx);
+                    }else
+                    {
+                        sliceLines.Add(textLeft);
+                        textLeft="";
+                        break;
+                    }
+                }
+                if(textLeft.Length==0)
                 {
-                    sliceLines.Add(textLeft);
                     break;
                 }
             }
@@ -221,20 +312,21 @@ public class PolyText : Graphic {
                 sliceLines.Clear();
                 slicePositions.Clear();
                 string textLeft=text;
+                bool lastWrapWasSeparator=true;
                 for(int c=startSlice;c<slices.Count;c++)
                 {
                     Rect r = slices[c];
                     float thisWidth=r.width*totalSize.x;
+                    //print(c+":"+thisWidth);
                     settings.generationExtents = new Vector2(thisWidth,totalSize.y);
                     generator.Populate(textLeft, settings);
                     float maxVertex=generator.verts.Count;
-    //                print(textLeft+","+generator.lines.Count+","+thisWidth+","+totalSize.x);
                     slicePositions.Add(r);
                     if(generator.lines.Count>1)
                     {
                         sliceLines.Add(textLeft.Substring(0,generator.lines[1].startCharIdx));
-    //                    maxVertex=generator.lines[1].startCharIdx*4;
                         textLeft=textLeft.Substring(generator.lines[1].startCharIdx);
+
                     }else
                     {
                         sliceLines.Add(textLeft);
@@ -257,7 +349,7 @@ public class PolyText : Graphic {
                 bool offset=(slices.Count&1)!=(numSlices&1);
                 int startSlice=offset?(offsetSlices.Count/2)-numSlices/2:(slices.Count/2)-numSlices/2;
                 int endSlice=numSlices+startSlice;
-                print("try slices: "+numSlices+":"+offset+":"+startSlice);
+                //print("try slices: "+numSlices+":"+offset+":"+startSlice);
                 sliceLines.Clear();
                 slicePositions.Clear();
                 string textLeft=text;

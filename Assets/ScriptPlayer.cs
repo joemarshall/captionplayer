@@ -8,6 +8,7 @@ using UnityEngine.Video;
 public class ScriptPlayer : MonoBehaviour {
 
     public Canvas canvas;
+    public string scriptFolder;
     
     OSC osc;
 
@@ -57,8 +58,13 @@ public class ScriptPlayer : MonoBehaviour {
     };
         
     string GetScriptItems() 
-    {        
-        string filePath = System.IO.Path.Combine(Application.streamingAssetsPath, "threeway.txt");
+    {
+        string folder=scriptFolder;
+        if(scriptFolder.Length==0)
+        {
+            folder=Application.streamingAssetsPath;
+        }
+        string filePath = System.IO.Path.Combine(folder, "script.txt");
         string result;
         if (filePath.Contains("://")) {
             WWW www = new WWW(filePath);
@@ -70,7 +76,12 @@ public class ScriptPlayer : MonoBehaviour {
 
     Texture2D LoadScriptImage(string path) 
     {        
-        string filePath = System.IO.Path.Combine(Application.streamingAssetsPath,  path);
+        string folder=scriptFolder;
+        if(scriptFolder.Length==0)
+        {
+            folder=Application.streamingAssetsPath;
+        }
+        string filePath = System.IO.Path.Combine(folder, path);
         Texture2D result;
         if (filePath.Contains("://")) {
             WWW www = new WWW(filePath);
@@ -87,7 +98,12 @@ public class ScriptPlayer : MonoBehaviour {
 
     string LoadScriptVideo(string path) 
     {        
-        string filePath = System.IO.Path.Combine(Application.streamingAssetsPath,  path);
+        string folder=scriptFolder;
+        if(scriptFolder.Length==0)
+        {
+            folder=Application.streamingAssetsPath;
+        }
+        string filePath = System.IO.Path.Combine(folder, path);
         return filePath;
         // if (filePath.Contains("://")) {
             // return filePath;

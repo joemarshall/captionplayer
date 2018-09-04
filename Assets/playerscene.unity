@@ -162,15 +162,18 @@ MonoBehaviour:
   m_Material: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 0, g: 0.04827571, b: 1, a: 1}
   m_RaycastTarget: 1
-  text: "a\n<b>aaa</b>\n<color=\"#ff00ff\">aaa</color>\n\u25A0aaa\naaa\n"
+  text: ' this without dodgy wrapping a a'
   alignment: 1
   font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-  fontSize: 64
+  fontSize: 50
   clipPoly:
-  - {x: 0.1, y: 0}
-  - {x: 0.8, y: 0}
-  - {x: 0.8, y: 1}
-  - {x: 0.1, y: 1}
+  - {x: 0.5, y: 0.2}
+  - {x: 0.7, y: 0.1}
+  - {x: 0.8, y: 0.6}
+  - {x: 0.1, y: 0.8}
+  polyMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  showPoly: 0
+  forceFlatTopAndBottom: 1
 --- !u!222 &634812891
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -494,6 +497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 1746982041}
+  scriptFolder: D:\jqm\fellowship\iii\caption-test-data
 --- !u!114 &1931848383
 MonoBehaviour:
   m_ObjectHideFlags: 0
